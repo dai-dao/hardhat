@@ -149,7 +149,6 @@ export class HardhatNode extends EventEmitter {
       allowUnlimitedContractSize,
       tracingConfig,
       minGasPrice,
-      chainId,
     } = config;
 
     let common: Common;
@@ -212,7 +211,7 @@ export class HardhatNode extends EventEmitter {
       }
 
       hardforkActivationBlocks =
-        config.hardforkActivationBlocksByChain?.[chainId];
+        config.hardforkActivationBlocksByChain?.[forkNetworkId];
     } else {
       const hardhatStateManager = new HardhatStateManager();
       await hardhatStateManager.initializeGenesisAccounts(genesisAccounts);
