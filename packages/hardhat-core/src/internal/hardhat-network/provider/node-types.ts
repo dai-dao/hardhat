@@ -16,11 +16,6 @@ export function isForkedNodeConfig(
   return "forkConfig" in config && config.forkConfig !== undefined;
 }
 
-export type HardforkActivationBlocks = Record<
-  typeof HARDHAT_NETWORK_SUPPORTED_HARDFORKS[number],
-  number
->;
-
 interface CommonConfig {
   automine: boolean;
   blockGasLimit: number;
@@ -34,12 +29,14 @@ interface CommonConfig {
   initialDate?: Date;
   tracingConfig?: TracingConfig;
   initialBaseFeePerGas?: number;
-  hardforkActivationBlocks?: {
-    [chainId: number]: HardforkActivationBlocks;
-  };
 }
 
 export type LocalNodeConfig = CommonConfig;
+
+export type HardforkActivationBlocks = Record<
+  typeof HARDHAT_NETWORK_SUPPORTED_HARDFORKS[number],
+  number
+>;
 
 export interface ForkConfig {
   jsonRpcUrl: string;
@@ -49,6 +46,9 @@ export interface ForkConfig {
 export interface ForkedNodeConfig extends CommonConfig {
   forkConfig: ForkConfig;
   forkCachePath?: string;
+  hardforkActivationBlocksByChain?: {
+    [chainId: number]: HardforkActivationBlocks;
+  };
 }
 
 export interface TracingConfig {

@@ -226,7 +226,6 @@ export class HardhatNetworkProvider
       tracingConfig: await this._makeTracingConfig(),
       initialBaseFeePerGas: this._initialBaseFeePerGas,
       hardfork: this._hardfork,
-      hardforkActivationBlocks: this._hardforkActivationBlocks,
       networkName: this._networkName,
       chainId: this._chainId,
       networkId: this._networkId,

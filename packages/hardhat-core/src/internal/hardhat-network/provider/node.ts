@@ -150,7 +150,6 @@ export class HardhatNode extends EventEmitter {
       tracingConfig,
       minGasPrice,
       chainId,
-      hardforkActivationBlocks,
     } = config;
 
     let common: Common;
@@ -159,6 +158,7 @@ export class HardhatNode extends EventEmitter {
     let initialBlockTimeOffset: BN | undefined;
     let nextBlockBaseFeePerGas: BN | undefined;
     let forkNetworkId: number | undefined;
+    let hardforkActivationBlocks: HardforkActivationBlocks | undefined;
 
     const initialBaseFeePerGasConfig =
       config.initialBaseFeePerGas !== undefined
@@ -210,6 +210,9 @@ export class HardhatNode extends EventEmitter {
           }
         }
       }
+
+      hardforkActivationBlocks =
+        config.hardforkActivationBlocksByChain?.[chainId];
     } else {
       const hardhatStateManager = new HardhatStateManager();
       await hardhatStateManager.initializeGenesisAccounts(genesisAccounts);
@@ -265,10 +268,7 @@ export class HardhatNode extends EventEmitter {
       tracingConfig,
       forkNetworkId,
       nextBlockBaseFeePerGas,
-      hardforkActivationBlocks !== undefined &&
-      hardforkActivationBlocks[chainId] !== undefined
-        ? hardforkActivationBlocks[chainId]
-        : undefined
+      hardforkActivationBlocks
     );
 
     return [common, node];

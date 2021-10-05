@@ -740,7 +740,9 @@ describe("HardhatNode", () => {
     const [, regularNode] = await HardhatNode.create(forkedNodeConfig);
     const [, nodeWithEarlyLondon] = await HardhatNode.create({
       ...forkedNodeConfig,
-      hardforkActivationBlocks: { 1: { london: eip1559ActivationBlock - 1 } },
+      hardforkActivationBlocksByChain: {
+        1: { london: eip1559ActivationBlock - 1 },
+      },
     });
 
     /** execute a call to method Hello() on contract HelloWorld, deployed to
