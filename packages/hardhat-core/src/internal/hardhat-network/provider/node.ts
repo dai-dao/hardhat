@@ -157,6 +157,7 @@ export class HardhatNode extends EventEmitter {
     let initialBlockTimeOffset: BN | undefined;
     let nextBlockBaseFeePerGas: BN | undefined;
     let forkNetworkId: number | undefined;
+    let forkBlockNum: number | undefined;
     let hardforkActivationBlocks: HardforkActivationBlocks | undefined;
 
     const initialBaseFeePerGasConfig =
@@ -172,12 +173,9 @@ export class HardhatNode extends EventEmitter {
       common = await makeForkCommon(config);
 
       forkNetworkId = forkClient.getNetworkId();
+      forkBlockNum = forkBlockNumber.toNumber();
 
-      this._validateHardforks(
-        config.forkConfig.blockNumber,
-        common,
-        forkNetworkId
-      );
+      this._validateHardforks(forkBlockNum, common, forkNetworkId);
 
       const forkStateManager = new ForkStateManager(
         forkClient,
@@ -262,10 +260,12 @@ export class HardhatNode extends EventEmitter {
       txPool,
       automine,
       minGasPrice,
+      hardfork,
       initialBlockTimeOffset,
       genesisAccounts,
       tracingConfig,
       forkNetworkId,
+      forkBlockNum,
       nextBlockBaseFeePerGas,
       hardforkActivationBlocks
     );
@@ -336,10 +336,12 @@ Hardhat Network's forking functionality only works with blocks from at least spu
     private readonly _txPool: TxPool,
     private _automine: boolean,
     private _minGasPrice: BN,
+    private readonly _hardfork: string,
     private _blockTimeOffsetSeconds: BN = new BN(0),
     genesisAccounts: GenesisAccount[],
     tracingConfig?: TracingConfig,
     private _forkNetworkId?: number,
+    private _forkBlockNumber?: number,
     nextBlockBaseFee?: BN,
     private readonly _hardforkActivationBlocks: HardforkActivationBlocks = mainnetHardforkActivations
   ) {
@@ -2325,12 +2327,20 @@ Hardhat Network's forking functionality only works with blocks from at least spu
     return { maxFeePerGas, maxPriorityFeePerGas };
   }
 
-  /** search this._hardforkActivationBlocks for the highest block number that
-   * isn't higher than blockNum, and then return that found block number's
-   * associated hardfork name. */
   private _selectHardforkFromActivations(
     blockNum: BN
   ): typeof HARDHAT_NETWORK_SUPPORTED_HARDFORKS[number] {
+    if (
+      this._hardforkActivationBlocks === undefined ||
+      (this._forkBlockNumber !== undefined &&
+        blockNum.gte(new BN(this._forkBlockNumber)))
+    ) {
+      return this._hardfork;
+    }
+
+    /** search this._hardforkActivationBlocks for the highest block number that
+     * isn't higher than blockNum, and then return that found block number's
+     * associated hardfork name. */
     let highestFound: {
       hardfork: typeof HARDHAT_NETWORK_SUPPORTED_HARDFORKS[number];
       block: number;
